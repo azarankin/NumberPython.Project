@@ -19,4 +19,4 @@ EXPOSE 5000
 ENV NAME World
 
 # Run main.py when the container launches
-CMD ["python", "main.py"]
+CMD ["python3", "main.py"]
