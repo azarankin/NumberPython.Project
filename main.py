@@ -17,7 +17,7 @@ app = Flask(__name__)
 files_dir = 'files'
 if not os.path.exists(files_dir):
     os.makedirs(files_dir)
-    
+
 
 @app.route('/')
 def index():
@@ -80,4 +80,4 @@ def predict():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=os.getenv("PORT", default=5000))

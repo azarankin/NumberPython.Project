@@ -1,8 +1,0 @@
-version: 2
-services:
-  - name: web
-    image: "python:3.8"
-    command: "python main.py"
-    env:
-      - key: PORT
-        value: "5000"
