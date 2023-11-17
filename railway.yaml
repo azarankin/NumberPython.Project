@@ -1,0 +1,15 @@
+version: 2
+services:
+  - name: web
+    image: "python:3.8"
+    command: "gunicorn -w 4 -b 0.0.0.0:$PORT main:app"
+    env:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    build:
+      use:
+        - python
+      steps:
+        - "COPY . /app"
+        - "RUN pip install --upgrade pip"
+        - "RUN pip install -r /app/requirements.txt"
