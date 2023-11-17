@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+    <style>
+        /* Add some styling for better appearance */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #fileInput {
+            display: none; /* Hide the default file input */
+        }
+
+        #chooseFileBtn, .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+
+        #canvasContainer {
+            margin-top: 20px;
+            border: 2px solid #3498db;
+            display: flex;
+            justify-content: center;
+        }
+
+        #canvas {
+            border: 2px solid #e74c3c;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+    <h1>Number Detector</h1>
+    <p>
+        Write or Upload an image that contain a number.<br>
+        Currently: 0, 1, 5, 7 not works, correctness of 40%.<br>
+        Draw a big number close to the middle of the canvas.<br>
+    </p>
+
+    <div id="canvasContainer">
+        <canvas id="canvas" width="280" height="280"></canvas>
+    </div>
+
+
+
+    <button onclick="sendDrawing()" class="btn">Send Drawing</button>
+    <button onclick="resetCanvas()" class="btn">Reset Canvas</button>
+<br>
+
+
+    <div id="result">
+        <!-- The JSON result will be displayed here -->
+    </div>
+
+
+    <br>
+    <label for="fileInput" id="chooseFileBtn" ondrop="dropHandler(event)" ondragover="dragOverHandler(event)" ondragleave="dragLeaveHandler(event)">Custom File Upload</label>
+    <input type="file" id="fileInput" accept="image/*" required>
+
+    <p>choose black and white image to upload.</p>
+
+
+
+    <script>
+
+
+        function fetchResult(formData) {
+            
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';  // Clear previous results
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultDiv.innerHTML = `<p>Number: <strong>${data.number}</strong>, Probability: ${data.probability}%</p>`;
+                resultDiv.innerHTML += `<p><img src="/${data.image_address}" alt="${data.number} ${data.probability}%" /></p>`;
+            })
+            .catch(error => console.error('Error:', error));
+            
+            
+            fileInput.value = ''; 
+        }
+
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const fileInput = event.target;
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            fetchResult(formData);
+            resetCanvas();
+        });
+
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        let drawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        canvas.addEventListener('mouseleave', function () {
+            if (drawing) {
+                drawing = false;
+                sendDrawing();  // Send the drawing when the mouse leaves the canvas
+            }
+        });
+
+        canvas.addEventListener('mousedown', function (e) {
+            drawing = true;
+            draw(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop, false);
+        });
+
+        canvas.addEventListener('mousemove', function (e) {
+            if (drawing) {
+                draw(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop, true);
+            }
+        });
+
+        canvas.addEventListener('mouseup', function () {
+            drawing = false;
+            sendDrawing(); // Send drawing when mouse is released
+        });
+
+        canvas.addEventListener('mouseleave', function () {
+            drawing = false;
+        });
+
+        function draw(x, y, isDown) {
+            if (isDown) {
+                context.beginPath();
+                context.strokeStyle = '#000';
+                context.lineWidth = 20;
+                context.lineJoin = 'round';
+                context.moveTo(lastX, lastY);
+                context.lineTo(x, y);
+                context.closePath();
+                context.stroke();
+            }
+            lastX = x;
+            lastY = y;
+        }
+
+        function sendDrawing() {
+            var newCanvas = document.createElement('canvas');
+            var newContext = newCanvas.getContext('2d');
+
+            newCanvas.width = canvas.width;
+            newCanvas.height = canvas.height;
+            newContext.fillStyle = 'white';
+            newContext.fillRect(0, 0, newCanvas.width, newCanvas.height);
+            newContext.drawImage(canvas, 0, 0);
+
+            newCanvas.toBlob(function (blob) {
+                var formData = new FormData();
+                formData.append('file', blob, 'drawing.jpg');
+
+
+
+                fetchResult(formData);
+                
+            }, 'image/jpeg');
+        }
+
+        function resetCanvas() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    </script>
+</body>
+</html>

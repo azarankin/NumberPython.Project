@@ -21,9 +21,6 @@ def load_dataset(data_set_file):
 
 
 
-# Check if the weights file exists
-
-
 
 def set_weight(data_set_file, weights_file):
     if os.path.exists(weights_file):
