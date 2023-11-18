@@ -55,7 +55,7 @@
     <h1>Number Detector</h1>
 
     <div id="result">
-        <p><strong></strong></p><p><strong></strong></p>
+        <p><strong>&nbsp;</strong></p><p><strong>&nbsp;</strong></p>
         <!-- The JSON result will be displayed here -->
     </div>
 
@@ -85,7 +85,7 @@
     <script>
         function fetchResult(formData) {
             const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<p><strong></strong></p><p><strong></strong></p>';  // Clear previous results
+            resultDiv.innerHTML = '<p><strong>&nbsp;</strong></p><p><strong>&nbsp;</strong></p>';  // Clear previous results
 
             fetch('/predict', {
                 method: 'POST',
