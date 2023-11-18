@@ -20,5 +20,5 @@ ENV NAME World
 
 
 # Run app.py when the container launches
-CMD ["gunicorn", "main:app", "-b", "0.0.0.0:5000"]
-#CMD ["python", "main.py"]
+#CMD ["gunicorn", "main:app", "-b", "0.0.0.0:5000"]
+CMD ["python", "main.py"]
