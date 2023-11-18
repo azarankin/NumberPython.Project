@@ -19,6 +19,12 @@ EXPOSE 5000
 ENV NAME World
 
 
+EXPOSE $PORT
+CMD ["gunicorn", "main:app", "-b", "0.0.0.0:$PORT"]
+
+
+
+
 # Run app.py when the container launches
 #CMD ["gunicorn", "main:app", "-b", "0.0.0.0:5000"]
-CMD ["python", "main.py"]
+#CMD ["python", "main.py"]
