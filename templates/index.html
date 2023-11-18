@@ -46,13 +46,16 @@
             border: 2px solid #e74c3c;
             cursor: crosshair;
         }
+        strong {
+            font-size: 3em; /* Adjust the font size as needed */
+        }
     </style>
 </head>
 <body>
     <h1>Number Detector</h1>
     <p>
-        Write or Upload an image that contain a number.<br>
-        Currently: 0, 1, 5, 7 not works, correctness of 40%.<br>
+        Write or Upload an image that contains a number.<br>
+        Currently: 0, 1, 5, 7 not working, correctness of 40%.<br>
         Draw a big number close to the middle of the canvas.<br>
     </p>
 
@@ -60,32 +63,22 @@
         <canvas id="canvas" width="280" height="280"></canvas>
     </div>
 
-
-
     <button onclick="sendDrawing()" class="btn">Send Drawing</button>
     <button onclick="resetCanvas()" class="btn">Reset Canvas</button>
-<br>
-
+    <br>
 
     <div id="result">
         <!-- The JSON result will be displayed here -->
     </div>
 
-
     <br>
     <label for="fileInput" id="chooseFileBtn" ondrop="dropHandler(event)" ondragover="dragOverHandler(event)" ondragleave="dragLeaveHandler(event)">Custom File Upload</label>
     <input type="file" id="fileInput" accept="image/*" required>
 
-    <p>choose black and white image to upload.</p>
-
-
+    <p>Choose a black and white image to upload.</p>
 
     <script>
-
-
         function fetchResult(formData) {
-            
-
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = '';  // Clear previous results
 
@@ -95,15 +88,13 @@
             })
             .then(response => response.json())
             .then(data => {
-                resultDiv.innerHTML = `<p>Number: <strong>${data.number}</strong>, Probability: ${data.probability}%</p>`;
+                resultDiv.innerHTML = `<p>Number: <strong>${data.number}</strong>, Probability: <strong>${data.probability}%</strong></p>`;
                 resultDiv.innerHTML += `<p><img src="/${data.image_address}" alt="${data.number} ${data.probability}%" /></p>`;
             })
             .catch(error => console.error('Error:', error));
-            
-            
+
             fileInput.value = ''; 
         }
-
 
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const fileInput = event.target;
@@ -140,11 +131,32 @@
 
         canvas.addEventListener('mouseup', function () {
             drawing = false;
-            sendDrawing(); // Send drawing when mouse is released
+            sendDrawing(); // Send drawing when the mouse is released
         });
 
         canvas.addEventListener('mouseleave', function () {
             drawing = false;
+        });
+
+        // Touch events
+        canvas.addEventListener('touchstart', function (e) {
+            e.preventDefault();
+            var touch = e.touches[0];
+            drawing = true;
+            draw(touch.clientX - canvas.offsetLeft, touch.clientY - canvas.offsetTop, false);
+        });
+
+        canvas.addEventListener('touchmove', function (e) {
+            e.preventDefault();
+            var touch = e.touches[0];
+            if (drawing) {
+                draw(touch.clientX - canvas.offsetLeft, touch.clientY - canvas.offsetTop, true);
+            }
+        });
+
+        canvas.addEventListener('touchend', function () {
+            drawing = false;
+            sendDrawing();
         });
 
         function draw(x, y, isDown) {
@@ -153,8 +165,8 @@
                 context.strokeStyle = '#000';
                 context.lineWidth = 20;
                 context.lineJoin = 'round';
-                context.moveTo(lastX, lastY);
-                context.lineTo(x, y);
+                context.moveTo(lastX + window.scrollX, lastY + window.scrollY);
+                context.lineTo(x + window.scrollX, y + window.scrollY);
                 context.closePath();
                 context.stroke();
             }
@@ -176,10 +188,7 @@
                 var formData = new FormData();
                 formData.append('file', blob, 'drawing.jpg');
 
-
-
                 fetchResult(formData);
-                
             }, 'image/jpeg');
         }
 
