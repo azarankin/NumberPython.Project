@@ -53,23 +53,20 @@
 </head>
 <body>
     <h1>Number Detector</h1>
-    <p>
-        Write or Upload an image that contains a number.<br>
-        Currently: 0, 1, 5, 7 not working, correctness of 40%.<br>
-        Draw a big number close to the middle of the canvas.<br>
-    </p>
+
+    <div id="result">
+        <p><strong></strong></p><p><strong></strong></p>
+        <!-- The JSON result will be displayed here -->
+    </div>
 
     <div id="canvasContainer">
         <canvas id="canvas" width="280" height="280"></canvas>
     </div>
 
-    <button onclick="sendDrawing()" class="btn">Send Drawing</button>
+    <!--<button onclick="sendDrawing()" class="btn">Send Drawing</button> -->
     <button onclick="resetCanvas()" class="btn">Reset Canvas</button>
     <br>
 
-    <div id="result">
-        <!-- The JSON result will be displayed here -->
-    </div>
 
     <br>
     <label for="fileInput" id="chooseFileBtn" ondrop="dropHandler(event)" ondragover="dragOverHandler(event)" ondragleave="dragLeaveHandler(event)">Custom File Upload</label>
@@ -77,10 +74,18 @@
 
     <p>Choose a black and white image to upload.</p>
 
+    <p>
+        Write or Upload an image that contains a number.<br>
+        Currently: 0, 1, 5, 7 not working, correctness of 40%.<br>
+        Draw a big number close to the middle of the canvas.<br>
+    </p>
+
+
+
     <script>
         function fetchResult(formData) {
             const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '';  // Clear previous results
+            resultDiv.innerHTML = '<p><strong></strong></p><p><strong></strong></p>';  // Clear previous results
 
             fetch('/predict', {
                 method: 'POST',
@@ -89,7 +94,7 @@
             .then(response => response.json())
             .then(data => {
                 resultDiv.innerHTML = `<p>Number: <strong>${data.number}</strong>, Probability: <strong>${data.probability}%</strong></p>`;
-                resultDiv.innerHTML += `<p><img src="/${data.image_address}" alt="${data.number} ${data.probability}%" /></p>`;
+                resultDiv.innerHTML += `<p>Server received image: <strong><img src="/${data.image_address}" alt="${data.number} ${data.probability}%" /></strong></p>`;
             })
             .catch(error => console.error('Error:', error));
 
