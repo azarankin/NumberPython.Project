@@ -1,5 +1,7 @@
 import os
 import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
 
 def load_dataset(data_set_file):
 	assert os.path.exists(data_set_file)
@@ -18,8 +20,6 @@ def load_dataset(data_set_file):
 
 		return x_train, y_train
 	
-
-
 
 
 def set_weight(data_set_file, weights_file):
