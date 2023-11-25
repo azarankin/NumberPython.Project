@@ -8,9 +8,11 @@ import uuid
 import load_dataset_util
 import image_util
 import config
+import tensorflow as tf
 
+model = tf.keras.models.load_model('handwritten.model')
 
-weights_input_to_hidden, weights_hidden_to_output, bias_input_to_hidden, bias_hidden_to_output = load_dataset_util.set_weight(config.dataset_file, config.weights_file)
+#weights_input_to_hidden, weights_hidden_to_output, bias_input_to_hidden, bias_hidden_to_output = load_dataset_util.set_weight(config.dataset_file, config.weights_file)
 
 app = Flask(__name__)
 
@@ -44,20 +46,15 @@ def predict():
         # Preprocess the image
         processed_image = image_util.preprocess_image(image_data)
 
-        # Predict
-        image = np.reshape(processed_image, (-1, 1))
 
-        # Forward propagation (to hidden layer)
-        hidden_raw = bias_input_to_hidden + weights_input_to_hidden @ image
-        hidden = 1 / (1 + np.exp(-hidden_raw))  # sigmoid
-        # Forward propagation (to output layer)
-        output_raw = bias_hidden_to_output + weights_hidden_to_output @ hidden
-        output = 1 / (1 + np.exp(-output_raw))
-        output_probabilities = np.exp(output) / np.sum(np.exp(output), axis=0)
-        max_output_probabilities = "{:.0f}".format(np.max(output_probabilities) * 100)
 
-        predicted_number = output.argmax()
-        probability = int(max_output_probabilities)
+        prediction = model.predict(processed_image)
+
+
+
+
+        predicted_number = prediction.argmax()
+        probability = ''
 
         # Invert the colors of the processed image
         inverted_image = 1 - processed_image

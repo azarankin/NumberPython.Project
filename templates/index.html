@@ -76,7 +76,7 @@
 
     <p>
         Write or Upload an image that contains a number.<br>
-        Currently: 0, 1, 5, 7 not working, correctness of 40%.<br>
+        Currently: 1 not working, correctness of 65%.<br>
         Draw a big number close to the middle of the canvas.<br>
     </p>
 
@@ -93,7 +93,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                resultDiv.innerHTML = `<p>Number: <strong>${data.number}</strong>, Probability: <strong>${data.probability}%</strong></p>`;
+                resultDiv.innerHTML = `<p>Number: <strong>${data.number}</strong>, Probability: <strong>${data.probability}</strong></p>`;
                 resultDiv.innerHTML += `<p>Server received image: <strong><img src="/${data.image_address}" alt="${data.number} ${data.probability}%" /></strong></p>`;
             })
             .catch(error => console.error('Error:', error));
@@ -200,6 +200,35 @@
         function resetCanvas() {
             context.clearRect(0, 0, canvas.width, canvas.height);
         }
+
+
+
+
+        function dropHandler(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('fileInput');
+            fileInput.files = event.dataTransfer.files;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            fetchResult(formData);
+            resetCanvas();
+            chooseFileBtn.style.backgroundColor = null; 
+        }
+
+        function dragOverHandler(event) {
+            event.preventDefault();
+            const chooseFileBtn = document.getElementById('chooseFileBtn');
+            chooseFileBtn.style.backgroundColor = '#2ecc71'; // Change color when dragging over
+        }
+
+        function dragLeaveHandler(event) {
+            event.preventDefault();
+            const chooseFileBtn = document.getElementById('chooseFileBtn');
+            chooseFileBtn.style.backgroundColor = '#3498db'; // Change color back when dragging leaves
+        }
+
     </script>
 </body>
 </html>
